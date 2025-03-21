@@ -11,41 +11,55 @@ export default async function handleRequest(
   request,
   responseStatusCode,
   responseHeaders,
-  remixContext,
+  remixContext
 ) {
-  addDocumentResponseHeaders(request, responseHeaders);
-  const userAgent = request.headers.get("user-agent");
-  const callbackName = isbot(userAgent ?? "") ? "onAllReady" : "onShellReady";
+  try {
+    addDocumentResponseHeaders(request, responseHeaders);
+    const userAgent = request.headers.get("user-agent");
+    const isBotRequest = isbot(userAgent ?? "");
+    const callbackName = isBotRequest ? "onAllReady" : "onShellReady";
 
-  return new Promise((resolve, reject) => {
-    const { pipe, abort } = renderToPipeableStream(
-      <RemixServer context={remixContext} url={request.url} />,
-      {
-        [callbackName]: () => {
-          const body = new PassThrough();
-          const stream = createReadableStreamFromReadable(body);
+    return new Promise((resolve, reject) => {
+      const { pipe, abort } = renderToPipeableStream(
+        <RemixServer context={remixContext} url={request.url} />,
+        {
+          [callbackName]: () => {
+            try {
+              const body = new PassThrough();
+              const stream = createReadableStreamFromReadable(body);
 
-          responseHeaders.set("Content-Type", "text/html");
-          resolve(
-            new Response(stream, {
-              headers: responseHeaders,
-              status: responseStatusCode,
-            }),
-          );
-          pipe(body);
-        },
-        onShellError(error) {
-          reject(error);
-        },
-        onError(error) {
-          responseStatusCode = 500;
-          console.error(error);
-        },
-      },
-    );
+              responseHeaders.set("Content-Type", "text/html; charset=utf-8");
+              responseHeaders.set("Permissions-Policy", "interest-cohort=()");
+              responseHeaders.set("X-Frame-Options", "ALLOWALL");
 
-    // Automatically timeout the React renderer after 6 seconds, which ensures
-    // React has enough time to flush down the rejected boundary contents
-    setTimeout(abort, streamTimeout + 1000);
-  });
+              resolve(
+                new Response(stream, {
+                  headers: responseHeaders,
+                  status: responseStatusCode,
+                })
+              );
+              pipe(body);
+            } catch (error) {
+              reject(error);
+            }
+          },
+          onShellError(error) {
+            console.error("Shell rendering error:", error);
+            reject(error);
+          },
+          onError(error) {
+            console.error("Streaming error:", error);
+          },
+        }
+      );
+
+      setTimeout(() => {
+        console.error("Stream timeout reached, aborting...");
+        abort();
+      }, streamTimeout + 1000);
+    });
+  } catch (error) {
+    console.error("Unexpected error in handleRequest:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
 }
