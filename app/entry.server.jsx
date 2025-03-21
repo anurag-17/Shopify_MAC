@@ -28,7 +28,10 @@ export default async function handleRequest(
               const body = new PassThrough();
               const stream = createReadableStreamFromReadable(body);
 
-              responseHeaders.set("Content-Type", "text/html; charset=utf-8");
+              responseHeaders.set(
+                "Content-Security-Policy",
+                "frame-ancestors 'self' https://admin.shopify.com https://*.myshopify.com;"
+              );
               responseHeaders.set("Permissions-Policy", "interest-cohort=()");
               responseHeaders.set("X-Frame-Options", "ALLOWALL");
 

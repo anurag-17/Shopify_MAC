@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "8a5b354e6631c8f35af52d562117c736"
-application_url = "https://idea-letters-nascar-vertex.trycloudflare.com"
+application_url = "https://donor-allan-living-jean.trycloudflare.com"
 embedded = true
 name = "test-shweta-app"
 handle = "test-shweta-app"
@@ -23,14 +23,14 @@ api_version = "2025-01"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "read_products, write_products"
 
 [auth]
 redirect_urls = [
-  "https://idea-letters-nascar-vertex.trycloudflare.com/auth/callback",
-  "https://idea-letters-nascar-vertex.trycloudflare.com/auth/shopify/callback",
-  "https://idea-letters-nascar-vertex.trycloudflare.com/api/auth/callback"
+  "https://donor-allan-living-jean.trycloudflare.com/auth/callback",
+  "https://donor-allan-living-jean.trycloudflare.com/auth/shopify/callback",
+  "https://donor-allan-living-jean.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]
-embedded = false
+embedded = true
