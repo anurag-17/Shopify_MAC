@@ -5,7 +5,6 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import App from "./component/App";
 
 export default function Root() {
   return (
@@ -22,7 +21,6 @@ export default function Root() {
         <Links />
       </head>
       <body>
-        <App />
         <Outlet />
         <ScrollRestoration />
         <Scripts />
